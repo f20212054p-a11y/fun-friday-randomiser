@@ -11,10 +11,22 @@
   --white:#ffffff;
 }
 body{margin:0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;background:radial-gradient(circle at top left,#1f1f3a 0%,var(--bg) 70%);}
-.display{
-  width:400px;height:200px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
-  border:2px solid rgba(255,255,255,0.08); display:flex; justify-content:center; align-items:center; font-size:50px;font-weight:700;text-align:center;transition:transform .18s ease, opacity .18s ease;
+..display{
+  width:400px;
+  height:200px;
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+  border:2px solid rgba(255,255,255,0.08);
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
+  font-size:50px;
+  font-weight:700;
+  text-align:center;
+  color: var(--white);   /* ADD THIS LINE */
+  transition:transform .18s ease, opacity .18s ease;
 }
+
 .btn{
   display:block;margin:20px auto;padding:14px 20px;font-size:18px;font-weight:700;background:var(--accent);color:var(--white);border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 18px rgba(249,93,106,0.25);
 }
