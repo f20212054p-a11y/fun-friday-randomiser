@@ -1,258 +1,109 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Team Randomiser — Fun Friday</title>
-  <style>
-    :root{
-      --bg:#0f172a; /* dark navy */
-      --card:#0b1220;
-      --accent:#06b6d4; /* teal */
-      --muted:#94a3b8;
-      --white:#ffffff;
-    }
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-    body{background:radial-gradient(circle at top left, #071028 0%, var(--bg) 60%); color:var(--white); display:flex; align-items:center; justify-content:center; padding:28px; box-sizing:border-box;}
-    .wrap{width:100%; max-width:980px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; padding:26px; box-shadow:0 8px 40px rgba(2,6,23,0.6);}
-    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px;}
-    h1{font-size:20px; margin:0; letter-spacing:0.2px;}
-    p.sub{margin:0; color:var(--muted); font-size:13px;}
-    .top{display:flex; gap:14px; align-items:center;}
-    .big-screen{display:flex; gap:18px; align-items:flex-start; width:100%;}
-    .display {
-      flex:1;
-      min-height:140px;
-      border-radius:12px;
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      display:flex; align-items:center; justify-content:center; flex-direction:column; padding:14px;
-      border:1px solid rgba(255,255,255,0.03);
-    }
-    .name {
-      font-size:46px; font-weight:700; text-align:center; letter-spacing:0.6px;
-      transform-origin:center; transition:transform .18s ease, opacity .18s ease;
-    }
-    .hint{color:var(--muted); font-size:13px; margin-top:6px;}
-    .controls{display:flex; flex-direction:column; gap:12px; width:320px;}
-    .btn {
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      background:var(--accent); border:none; color:var(--bg); padding:14px 20px; font-weight:700; font-size:18px; border-radius:12px;
-      cursor:pointer; box-shadow:0 6px 18px rgba(6,182,212,0.16);
-    }
-    .btn.secondary{background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--white); font-weight:600;}
-    textarea {
-      width:100%; height:160px; resize:vertical; border-radius:10px; padding:12px; font-size:14px; color:var(--white);
-      background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03);
-    }
-    .small {font-size:13px; color:var(--muted);}
-    .row {display:flex; gap:10px; align-items:center;}
-    .confetti {pointer-events:none; position:fixed; inset:0; z-index:9999; overflow:hidden;}
-    .confetti .piece {position:absolute; font-size:18px; animation:fall 1200ms linear forwards;}
-    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity:0.98; } }
-    #weightPanel {margin-top:12px; padding:8px; border:1px solid rgba(255,255,255,0.06); border-radius:10px; max-height:200px; overflow-y:auto; background:rgba(255,255,255,0.02);}
-    #weightPanel div {display:flex; justify-content:space-between; margin-bottom:4px; align-items:center;}
-    @media (max-width:900px){ .big-screen{ flex-direction:column; } .controls{ width:100%; } .display{ width:100% } }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Fun Friday — Team Randomiser</title>
+<style>
+:root{
+  --bg:#1a1a2e;
+  --accent:#f95d6a;
+  --white:#ffffff;
+}
+body{margin:0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;background:radial-gradient(circle at top left,#1f1f3a 0%,var(--bg) 70%);}
+.display{
+  width:400px;height:200px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+  border:2px solid rgba(255,255,255,0.08); display:flex; justify-content:center; align-items:center; font-size:50px;font-weight:700;text-align:center;transition:transform .18s ease, opacity .18s ease;
+}
+.btn{
+  display:block;margin:20px auto;padding:14px 20px;font-size:18px;font-weight:700;background:var(--accent);color:var(--white);border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 18px rgba(249,93,106,0.25);
+}
+.confetti{pointer-events:none;position:fixed;inset:0;z-index:9999;overflow:hidden;}
+.confetti .piece{position:absolute;font-size:18px;animation:fall 1200ms linear forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0.98;}}
+</style>
 </head>
 <body>
-  <div class="wrap" role="application" aria-label="Fun Friday Randomiser">
-    <header>
-      <div>
-        <h1>Fun Friday — Team Randomiser</h1>
-        <p class="sub">Click <strong>Jumble & Pick</strong> to see the names jumbled live, then reveal a pick. Names remain in pool.</p>
-      </div>
-      <div class="small">Made for your team — paste names below</div>
-    </header>
 
-    <div class="big-screen">
-      <div class="display" id="display">
-        <div class="name" id="nameDisplay">Ready?</div>
-        <div class="hint" id="hint">Click <strong>Jumble & Pick</strong> to start — or edit the names list on the right.</div>
-      </div>
-
-      <div class="controls" aria-hidden="false">
-        <textarea id="namesInput" aria-label="List of names (one per line)"></textarea>
-
-        <button class="btn secondary" id="toggleWeights">⚙️ Show Weights</button>
-        <div id="weightPanel" style="display:none;"></div>
-
-        <div class="row">
-          <button class="btn" id="startBtn">🎲 Jumble & Pick</button>
-          <button class="btn secondary" id="resetBtn">🔁 Reset Animation</button>
-        </div>
-
-        <div class="row small">
-          <label style="display:flex;gap:6px;align-items:center">
-            <input type="checkbox" id="confettiToggle" checked /> <span>Confetti on reveal</span>
-          </label>
-          <div style="flex:1"></div>
-          <div class="small">Repeatable picks (names stay)</div>
-        </div>
-      </div>
-    </div>
-
-    <footer>
-      <div class="small">Tip: Edit names, then press Jumble & Pick during your meeting (works inside Canva embed).</div>
-      <div class="small">Designed for screen-share / presentation</div>
-    </footer>
-  </div>
-
-  <div class="confetti" id="confetti"></div>
+<div>
+  <div class="display" id="nameDisplay">Ready?</div>
+  <button class="btn" id="startBtn">🎲 Jumble & Pick</button>
+</div>
+<div class="confetti" id="confetti"></div>
 
 <script>
-  const defaultNames = [
-    "Onkar","Shashwat","Anindita","Aryan","Upasana","Ankita","Shagun","Muskan","Dusmanta","Akshat",
-    "Swati","SaiKeerthi","Amulya","Mahesh","Ayush","Mahek","Abhishek","Barsha","Rohini","Sharanjeet",
-    "Indrani","Yuvraj","Manisa","Jithu","Gauri","Adarsh","Amrita","Reshma","Sugundan","Preksha",
-    "Nidhi","Lakshita","Mugdha"
-  ];
+const nameDisplay = document.getElementById('nameDisplay');
+const startBtn = document.getElementById('startBtn');
+const confettiContainer = document.getElementById('confetti');
 
-  const namesInput = document.getElementById('namesInput');
-  namesInput.value = defaultNames.join('\n');
+let jumbleInterval=false;
 
-  const nameDisplay = document.getElementById('nameDisplay');
-  const hint = document.getElementById('hint');
-  const startBtn = document.getElementById('startBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const confettiToggle = document.getElementById('confettiToggle');
-  const confettiContainer = document.getElementById('confetti');
-
-  const toggleWeightsBtn = document.getElementById('toggleWeights');
-  const weightPanel = document.getElementById('weightPanel');
-
-  let jumbleInterval = null;
-  let isJumbling = false;
-  let weightedNames = [];
-
-  function getNames() {
-    const raw = namesInput.value.trim();
-    if (!raw) return [];
-    return raw.split('\n').map(s => s.trim()).filter(Boolean);
+// Fetch weights from JSON
+async function getWeightedNames(){
+  try{
+    const res=await fetch('weights.json?cache='+Date.now()); // prevent caching
+    return await res.json();
+  } catch(e){
+    alert('Cannot load names/weights. Admin may need to update.');
+    return [];
   }
+}
 
-  function randomFrom(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+function weightedRandomPick(weightedNames){
+  const total = weightedNames.reduce((sum,obj)=>sum+obj.weight,0);
+  let r=Math.random()*total;
+  for(let obj of weightedNames){
+    if(r<obj.weight) return obj.name;
+    r-=obj.weight;
   }
+}
 
-  function setupWeights() {
-    const names = getNames();
-    weightedNames = names.map(n => ({name:n, weight:1}));
-    renderWeights();
+function randomFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function fireConfetti(count=22){
+  const emojis=['🎉','✨','🎈','💫','🥳'];
+  for(let i=0;i<count;i++){
+    const el=document.createElement('div');
+    el.className='piece';
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    const size=12+Math.random()*20;
+    el.style.fontSize=size+'px';
+    el.style.left=Math.random()*100+'%';
+    el.style.top=(Math.random()*10-10)+'%';
+    el.style.opacity=0.98;
+    el.style.transform='translateY(-10vh) rotate('+(Math.random()*360)+'deg)';
+    el.style.animationDuration=(900+Math.random()*900)+'ms';
+    confettiContainer.appendChild(el);
+    setTimeout(()=>el.remove(),2200);
   }
+}
 
-  function renderWeights() {
-    weightPanel.innerHTML = '';
-    weightedNames.forEach((obj,i) => {
-      const div = document.createElement('div');
-      div.innerHTML = `
-        <span>${obj.name}</span>
-        <input type="number" min="1" value="${obj.weight}" data-index="${i}" style="width:50px"/>
-      `;
-      weightPanel.appendChild(div);
-    });
-    weightPanel.querySelectorAll('input').forEach(input => {
-      input.addEventListener('input', e => {
-        const idx = e.target.dataset.index;
-        weightedNames[idx].weight = Math.max(1, parseInt(e.target.value)||1);
-      });
-    });
-  }
+async function startJumble({duration=2800,speed=55}={}){
+  const weightedNames = await getWeightedNames();
+  if(!weightedNames.length){ alert('No names found!'); return;}
+  if(jumbleInterval) return;
+  nameDisplay.style.transform='scale(0.95)';
+  nameDisplay.textContent='Jumbling...';
 
-  function weightedRandomPick() {
-    const totalWeight = weightedNames.reduce((sum,obj)=>sum+obj.weight,0);
-    let r = Math.random()*totalWeight;
-    for (let obj of weightedNames) {
-      if (r < obj.weight) return obj.name;
-      r -= obj.weight;
-    }
-  }
+  const namesOnly=weightedNames.map(w=>w.name);
+  jumbleInterval=setInterval(()=>{
+    nameDisplay.style.opacity='0.95';
+    nameDisplay.textContent=randomFrom(namesOnly);
+    nameDisplay.style.transform='scale(1.03)';
+  },speed);
 
-  function startJumble({duration = 3000, speed = 60} = {}) {
-    const names = getNames();
-    if (!names.length) {
-      alert('Please add at least one name in the list.');
-      return;
-    }
-    if (isJumbling) return;
-    isJumbling = true;
-    startBtn.disabled = true;
-    nameDisplay.style.transform = 'scale(0.95)';
-    hint.textContent = 'Jumbling...';
+  setTimeout(()=>{
+    clearInterval(jumbleInterval);
+    jumbleInterval=false;
+    const final = weightedRandomPick(weightedNames);
+    nameDisplay.textContent=final;
+    nameDisplay.style.transform='scale(1.16)';
+    fireConfetti();
+    setTimeout(()=>{nameDisplay.style.transform='';},600);
+  },duration);
+}
 
-    // rapid show
-    jumbleInterval = setInterval(() => {
-      const n = randomFrom(names);
-      nameDisplay.style.opacity = '0.95';
-      nameDisplay.textContent = n;
-      nameDisplay.style.transform = 'scale(1.03)';
-    }, speed);
-
-    // stop after duration
-    setTimeout(() => {
-      clearInterval(jumbleInterval);
-      jumbleInterval = null;
-      const final = weightedRandomPick();
-      nameDisplay.textContent = final;
-      nameDisplay.style.transform = 'scale(1.16)';
-      hint.textContent = '🎉 Picked — press Jumble & Pick again to pick another.';
-      if (confettiToggle.checked) fireConfetti();
-      setTimeout(()=> {
-        nameDisplay.style.transform = '';
-        isJumbling = false;
-        startBtn.disabled = false;
-      }, 600);
-    }, duration);
-  }
-
-  function fireConfetti(count = 22) {
-    const emojis = ['🎉','✨','🎈','💫','🥳'];
-    for (let i=0;i<count;i++){
-      const el = document.createElement('div');
-      el.className = 'piece';
-      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      const size = 12 + Math.random()*20;
-      el.style.fontSize = size + 'px';
-      el.style.left = Math.random()*100 + '%';
-      el.style.top = (Math.random()*10 - 10) + '%';
-      el.style.opacity = 0.98;
-      el.style.transform = 'translateY(-10vh) rotate(' + (Math.random()*360) + 'deg)';
-      el.style.animationDuration = (900 + Math.random()*900) + 'ms';
-      confettiContainer.appendChild(el);
-      setTimeout(()=> el.remove(), 2200);
-    }
-  }
-
-  startBtn.addEventListener('click', () => startJumble({duration: 2800, speed: 55}));
-  resetBtn.addEventListener('click', () => {
-    if (jumbleInterval) { clearInterval(jumbleInterval); jumbleInterval = null; }
-    isJumbling = false;
-    startBtn.disabled = false;
-    nameDisplay.textContent = 'Ready?';
-    hint.textContent = 'Click Jumble & Pick to start — or edit the names list on the right.';
-    setupWeights();
-  });
-
-  toggleWeightsBtn.addEventListener('click', () => {
-    weightPanel.style.display = weightPanel.style.display === 'none' ? 'block' : 'none';
-  });
-
-  namesInput.addEventListener('input', setupWeights);
-
-  // optional: press space to start
-  window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
-      e.preventDefault();
-      startBtn.click();
-    }
-  });
-
-  // initialize weights on load
-  setupWeights();
-</script>
-</body>
-</html>
-
-  });
+startBtn.addEventListener('click', startJumble);
 </script>
 </body>
 </html>
