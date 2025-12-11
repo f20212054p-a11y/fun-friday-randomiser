@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin Weights</title>
+<style>
+body{font-family:Inter,sans-serif;padding:20px;background:#f0f0f0;}
+h1{color:#333;}
+input{width:60px;margin-left:10px;}
+div.nameRow{margin-bottom:6px;}
+button{margin-top:12px;padding:8px 16px;font-weight:700;background:#f95d6a;border:none;color:#fff;border-radius:8px;cursor:pointer;}
+</style>
+</head>
+<body>
+<h1>Admin — Adjust Weights</h1>
+<div id="weightsContainer"></div>
+<button id="saveBtn">💾 Save Weights</button>
+
+<script>
+const defaultNames=[
+"Onkar","Shashwat","Anindita","Aryan","Upasana","Ankita","Shagun","Muskan","Dusmanta","Akshat",
+"Swati","SaiKeerthi","Amulya","Mahesh","Ayush","Mahek","Abhishek","Barsha","Rohini","Sharanjeet",
+"Indrani","Yuvraj","Manisa","Jithu","Gauri","Adarsh","Amrita","Reshma","Sugundan","Preksha",
+"Nidhi","Lakshita","Mugdha"
+];
+
+let weightedNames=defaultNames.map(n=>({name:n,weight:1}));
+
+const container=document.getElementById('weightsContainer');
+
+function renderWeights(){
+  container.innerHTML='';
+  weightedNames.forEach((obj,i)=>{
+    const div=document.createElement('div');
+    div.className='nameRow';
+    div.innerHTML=`${obj.name} <input type="number" min="1" value="${obj.weight}" data-index="${i}"/>`;
+    container.appendChild(div);
+  });
+  container.querySelectorAll('input').forEach(input=>{
+    input.addEventListener('input', e=>{
+      const idx=e.target.dataset.index;
+      weightedNames[idx].weight=Math.max(1, parseInt(e.target.value)||1);
+    });
+  });
+}
+
+document.getElementById('saveBtn').addEventListener('click', async ()=>{
+  // Save JSON (GitHub edit or Netlify function)
+  // Simplest: download JSON and manually upload
+  const blob=new Blob([JSON.stringify(weightedNames,null,2)],{type:'application/json'});
+  const link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download='weights.json';
+  link.click();
+  alert('Weights updated! Upload weights.json to the hosting folder.');
+});
+
+renderWeights();
+</script>
+</body>
+</html>
